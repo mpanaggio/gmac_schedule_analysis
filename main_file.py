@@ -96,7 +96,7 @@ if 'Time' in cols:
         date=pd.to_datetime(fullsched_df['Date']).apply(lambda x: x.strftime('%Y-%m-%d'))
         time=pd.to_datetime(fullsched_df['Time']).apply(lambda x: x.strftime('%H:%M'))
         fullsched_df['Datetime']=pd.to_datetime(date + ' ' + time)
-        fullsched_df.drop(columns=['Date','Time'],inplace=True)
+        fullsched_df.drop(['Date','Time'],axis=1,inplace=True)
     except:
         print(date)
         print(time)
