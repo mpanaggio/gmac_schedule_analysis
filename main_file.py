@@ -18,8 +18,8 @@ statparams={'TripDistanceThreshold': 250,
             'TripTimeThreshold': dt.timedelta(hours=5), 
             'OffCampusThreshold': dt.timedelta(hours=24)}
 print("Current parameters:")
-print(pd.DataFrame.from_dict(params,orient='index',columns=['value']))
-print(pd.DataFrame.from_dict(statparams,orient='index',columns=['value']))
+print(pd.DataFrame.from_dict(params,orient='index').rename(columns={0:'value'}))
+print(pd.DataFrame.from_dict(statparams,orient='index').rename(columns={0:'value'}))
 #%% select schedule to importclean up schedule
 
 print('Available schedules in {}:'.format(os.getcwd()))
@@ -93,9 +93,13 @@ for col in necessary_cols:
 #%% Incorporate times if available
 if 'Time' in cols:
     try: 
-        fullsched_df['Datetime']=pd.to_datetime(pd.to_datetime(fullsched_df['Date']).apply(lambda x: x.strftime('%Y-%m-%d')) + ' ' + fullsched_df['Time'].apply(lambda x: x.strftime('%H:%M')))
+        date=pd.to_datetime(fullsched_df['Date']).apply(lambda x: x.strftime('%Y-%m-%d'))
+        time=pd.to_datetime(fullsched_df['Time']).apply(lambda x: x.strftime('%H:%M'))
+        fullsched_df['Datetime']=pd.to_datetime(date + ' ' + time)
         fullsched_df.drop(columns=['Date','Time'],inplace=True)
     except:
+        print(date)
+        print(time)
         raise IOError('Unable to parse time column. Check formatting.')
 else:
     day_of_week=aux.GetDay(fullsched_df['Date'])
