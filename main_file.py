@@ -70,9 +70,9 @@ print()
 
 try: 
     if sched_filetype=='xlsx':
-        fullsched_df=pd.read_excel(sched_filename + '.xlsx',header=0)
+        fullsched_df=pd.read_excel(sched_filename + '.xlsx',header=0,skip_blank_lines=True)
     elif sched_filetype=='csv':
-        fullsched_df=pd.read_csv(sched_filename + '.csv',header=0)
+        fullsched_df=pd.read_csv(sched_filename + '.csv',header=0,skip_blank_lines=True)
 except:
      print("Import Error: Check input file.")
      print("File must be a valid csv or xlsx file.")
@@ -94,12 +94,13 @@ for col in necessary_cols:
 if 'Time' in cols:
     try: 
         date=pd.to_datetime(fullsched_df['Date']).apply(lambda x: x.strftime('%Y-%m-%d'))
-        time=pd.to_datetime(fullsched_df['Time']).apply(lambda x: x.strftime('%H:%M'))
+        try: 
+            time=pd.to_datetime(fullsched_df['Time']).apply(lambda x: x.strftime('%H:%M'))
+        except:
+            time=pd.to_datetime(fullsched_df['Time'].apply(lambda x: dt.datetime.combine(dt.date.today(),x))).apply(lambda x: x.strftime('%H:%M'))
         fullsched_df['Datetime']=pd.to_datetime(date + ' ' + time)
         fullsched_df.drop(['Date','Time'],axis=1,inplace=True)
     except:
-        print(date)
-        print(time)
         raise IOError('Unable to parse time column. Check formatting.')
 else:
     day_of_week=aux.GetDay(fullsched_df['Date'])
